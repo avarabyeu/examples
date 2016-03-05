@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TA Open Days</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="webjars/bootstrap/3.3.6/css/bootstrap.css"/>
+    <link rel="stylesheet" href="app.css"/>
+
+    <script src="/webjars/angular/1.5.0/angular.js"></script>
+
+    <script src="/webjars/sockjs-client/1.0.3/dist/sockjs-1.0.3.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.4/lib/stomp.js"></script>
+    <script src="/webjars/AngularStompDK/0.8.2/dist/angular-stomp.js"></script>
+
+    <script src="/webjars/jquery/1.11.1/jquery.js"></script>
+    <script src="/webjars/bootstrap/3.3.6/js/bootstrap.js"></script>
+
+
+    <script src="app.js"></script>
+
+
+</head>
+<body ng-app="TAOpenDayDemo">
+
+<div class="container" ng-controller="openDayController">
+    <div class="row">
+        <div class="col-sm-6 col-md-4 col-md-offset-4">
+            <h1 class="text-center app-title">AMPQ Demo</h1>
+            <div class="row  app-block">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search for..." ng-model="outcomingMessage">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" ng-click="sendMessage(outcomingMessage)">Send!</button>
+                    </span>
+                </div>
+            </div><!-- /.row -->
+            <div class="row app-block">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Message</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="item in incomingMessages track by $index">
+                        <td>{{item}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

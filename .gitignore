@@ -10,3 +10,27 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+#Ignore Eclipse project files
+
+target/
+bin/
+.metadata
+.settings
+.project
+.classpath
+.springBeans
+.checkstyle
+test-output
+*.log
+
+#Ignore gitignore files created by Eclipse
+*/**/.gitignore
+
+## Directory-based project format
+.idea/
+*.iml
+
+## Gradle build directory
+build/
+.gradle/

@@ -1,0 +1,10 @@
+.app-title {
+    color: #555;
+    font-size: 18px;
+    font-weight: 400;
+    display: block;
+}
+
+.app-block {
+    margin-bottom: 12rem;
+}

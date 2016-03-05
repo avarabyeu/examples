@@ -1,0 +1,16 @@
+config:
+  websocket:
+    endpoint: /ampq
+    topicIncoming: /toServer
+    topicOutcoming: /fromServer
+
+  rabbit:
+    exchange: taOpenDayExchange
+    queue: taOpenDayQueue
+
+spring:
+  application:
+    name: TA Open Days Demo
+
+  rabbitmq:
+    host: docker.local

@@ -2,13 +2,14 @@ package com.epam.ta.openday;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.EvictingQueue;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.jayway.awaitility.Awaitility;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
@@ -45,7 +46,13 @@ public class CacheBasedListener extends AbstractListener {
 
         Awaitility.given().atMost(duration.toMillis(), TimeUnit.MILLISECONDS)
                 .pollDelay(com.jayway.awaitility.Duration.ONE_SECOND).until(() -> {
-            return Lists.newArrayList(cache).stream().filter(predicate).findAny().isPresent();
+            List<Message> messages;
+            //blocks receiving of messages until new copy is created
+            synchronized (cache) {
+                messages = new ArrayList<>(cache);
+            }
+            return messages.stream().filter(predicate).findAny().isPresent();
+
         });
     }
 

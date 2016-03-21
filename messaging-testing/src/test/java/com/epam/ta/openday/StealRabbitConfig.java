@@ -13,6 +13,12 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+/**
+ * Use config uses Server's properties which means it connects to the Server's queue
+ * Queue doesn't copy message to each consumer. So test client just steal message from the Server's queue
+ *
+ * @author Andrei Varabyeu
+ */
 @Configuration
 @PropertySource("classpath:application.yml")
 @EnableRabbit

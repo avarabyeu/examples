@@ -32,14 +32,12 @@
                     <span class="input-group-btn">
                     <div class="dropdown">
                         <button class="btn btn-default dropdown-toggle" type="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            Count
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" ng-model="count">
+                            {{count}}
                             <span class="caret"></span>
                         </button>
-                        <ul class="dropdown-menu" ng-model="count">
-                            <li><a href="#">1</a></li>
-                            <li><a href="#">100</a></li>
-                            <li><a href="#">1000</a></li>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat="c in counts"><a href="#" ng-click="countSelected(c)">{{c}}</a></li>
                         </ul>
                     </div>
                         </span>

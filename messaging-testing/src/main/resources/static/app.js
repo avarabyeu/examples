@@ -9,6 +9,7 @@ angular.module('TAOpenDayDemo', ['AngularStompDK'])
     })
     .controller('openDayController', function ($scope, ngstomp, inTopicName, outTopicName) {
         $scope.incomingMessages = [];
+        $scope.counts = [1, 5, 100];
 
         ngstomp
             .subscribeTo(inTopicName)
@@ -18,6 +19,11 @@ angular.module('TAOpenDayDemo', ['AngularStompDK'])
                 $scope.incomingMessages.push(message.body);
             })
             .connect();
+
+        $scope.countSelected = function (newCount) {
+            $scope.count = newCount;
+        };
+        $scope.countSelected(1);
 
         $scope.sendMessage = function (url, count) {
             var message = {};

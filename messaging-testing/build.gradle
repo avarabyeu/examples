@@ -30,11 +30,10 @@ repositories {
 }
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-amqp")
-    compile("org.springframework.boot:spring-boot-starter-websocket")
-    compile("org.springframework.boot:spring-boot-starter-actuator")
-    compile("org.springframework.boot:spring-boot-devtools")
-
+    compile 'org.springframework.boot:spring-boot-starter-amqp'
+    compile 'org.springframework.boot:spring-boot-starter-websocket'
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
+    compile 'org.springframework.boot:spring-boot-devtools'
 
     compile 'com.google.guava:guava:19.0'
 
@@ -45,5 +44,6 @@ dependencies {
 
 
 
-    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+    testCompile 'com.jayway.awaitility:awaitility:1.7.0'
 }

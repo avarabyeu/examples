@@ -30,16 +30,17 @@ public class Controller {
 
     @MessageMapping("${config.websocket.topicIncoming}")
     public void onWebsocketMessage(IncomingMessage message) throws Exception {
-        IntStream.range(0, message.getCount()).parallel()
-                .forEach((i) -> rabbitTemplate.convertAndSend(queueName, message.getUrl()));
-
+        IntStream.rangeClosed(1, message.getCount()).parallel()
+                .forEach((i) -> rabbitTemplate.convertAndSend(queueName, message.getUrl() + "-" + i));
     }
 
     @RabbitListener(bindings = @QueueBinding(
-            value = @Queue("${config.rabbit.queue}"),
-            exchange = @Exchange(value = "${config.rabbit.exchange}", type = ExchangeTypes.TOPIC)))
+            value = @Queue(value = "${config.rabbit.queue}", durable = "true"),
+            exchange = @Exchange(value = "${config.rabbit.exchange}", type = ExchangeTypes.TOPIC, durable = "true")))
     public void onRabbitMessage(String message) {
-        websocketTemplate.convertAndSend(topicOutcoming, "Processed by server:" + message + "");
+        if (null != message) {
+            websocketTemplate.convertAndSend(topicOutcoming, "Processed by server:" + message + "");
+        }
     }
 
     public static class IncomingMessage {

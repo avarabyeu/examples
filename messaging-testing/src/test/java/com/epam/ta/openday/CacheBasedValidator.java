@@ -17,11 +17,12 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
-public class MessagingValidator {
+public class CacheBasedValidator {
 
     /* Query Name/UUID for obtaining messages from RabbitMQ. Each time we need to create new queue */
     public static final String QUERY_UUID = UUID.randomUUID().toString();
     public static final String RABBIT_TRACE_EXCHANGE = "amq.rabbitmq.trace";
+    public static final String ALL_PUBLISHED_MESSAGES_QUEUE = "publish.#";
 
     /* Queue with messages */
     private final Queue<Message> cache;
@@ -32,7 +33,7 @@ public class MessagingValidator {
      * @param rabbitAdmin RabbitMQ admin to register queue in RabbitMQ
      * @param cacheSize   Count of element to be kept in memory for validation
      */
-    public MessagingValidator(RabbitAdmin rabbitAdmin, Integer cacheSize) {
+    public CacheBasedValidator(RabbitAdmin rabbitAdmin, Integer cacheSize) {
         this.cache = Queues.synchronizedQueue(EvictingQueue.create(cacheSize));
 
         /* create exclusive non-durable queue for obtaining messages */
@@ -44,7 +45,8 @@ public class MessagingValidator {
 
         /* binds query to RabbitMQ logging topic */
         rabbitAdmin.declareBinding(
-                BindingBuilder.bind(queue).to(new TopicExchange(RABBIT_TRACE_EXCHANGE)).with("publish.#"));
+                BindingBuilder.bind(queue).to(new TopicExchange(RABBIT_TRACE_EXCHANGE)).with(
+                        ALL_PUBLISHED_MESSAGES_QUEUE));
 
         rabbitAdmin.initialize();
     }
@@ -54,7 +56,7 @@ public class MessagingValidator {
      *
      * @param message Message
      */
-    @RabbitListener(queues = { "#{ T(com.epam.ta.openday.MessagingValidator).QUERY_UUID}" })
+    @RabbitListener(queues = { "#{ T(com.epam.ta.openday.CacheBasedValidator).QUERY_UUID}" })
     public final void onMessage(Message message) {
         cache.offer(message);
     }

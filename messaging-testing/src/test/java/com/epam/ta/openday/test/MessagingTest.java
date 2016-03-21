@@ -1,5 +1,8 @@
-package com.epam.ta.openday;
+package com.epam.ta.openday.test;
 
+import com.epam.ta.openday.CacheBasedValidator;
+import com.epam.ta.openday.RabbitMQConfig;
+import com.epam.ta.openday.StealRabbitConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.amqp.core.Message;
@@ -19,11 +22,11 @@ import java.util.function.Predicate;
 public class MessagingTest {
 
     @Autowired
-    private MessagingValidator messagingValidator;
+    private CacheBasedValidator cacheBasedValidator;
 
     @Test
     public void testMessaging() {
-        messagingValidator.waitForMessage(new Predicate<Message>() {
+        cacheBasedValidator.waitForMessage(new Predicate<Message>() {
             @Override
             public boolean test(Message message) {
                 byte[] body = message.getBody();

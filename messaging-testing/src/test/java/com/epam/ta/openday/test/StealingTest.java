@@ -1,5 +1,6 @@
-package com.epam.ta.openday;
+package com.epam.ta.openday.test;
 
+import com.epam.ta.openday.StealRabbitConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

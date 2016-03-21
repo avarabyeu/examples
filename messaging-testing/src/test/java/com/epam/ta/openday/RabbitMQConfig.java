@@ -64,8 +64,8 @@ public class RabbitMQConfig {
      * @return Messaging validator
      */
     @Bean
-    public MessagingValidator messagingValidator() {
-        return new MessagingValidator(rabbitAdmin(), messageValidatorCacheSize);
+    public CacheBasedValidator messagingValidator() {
+        return new CacheBasedValidator(rabbitAdmin(), messageValidatorCacheSize);
     }
 
     @Bean

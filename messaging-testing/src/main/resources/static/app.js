@@ -19,8 +19,11 @@ angular.module('TAOpenDayDemo', ['AngularStompDK'])
             })
             .connect();
 
-        $scope.sendMessage = function (outcomingMessage) {
+        $scope.sendMessage = function (url, count) {
+            var message = {};
+            message.url = url;
+            message.count = count;
             ngstomp
-                .send(outTopicName, outcomingMessage);
+                .send(outTopicName, message);
         }
     });

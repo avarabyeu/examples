@@ -11,31 +11,64 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
+import java.util.stream.IntStream;
+
 @org.springframework.stereotype.Controller
 public class Controller {
 
-	@Autowired
-	private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
-	@Autowired
-	private SimpMessagingTemplate websocketTemplate;
+    @Autowired
+    private SimpMessagingTemplate websocketTemplate;
 
-	@Value("${config.rabbit.queue}")
-	private String queueName;
+    @Value("${config.rabbit.queue}")
+    private String queueName;
 
-	@Value("${config.websocket.topicOutcoming}")
-	private String topicOutcoming;
+    @Value("${config.websocket.topicOutcoming}")
+    private String topicOutcoming;
 
-	@MessageMapping("${config.websocket.topicIncoming}")
-	public void onWebsocketMessage(String message) throws Exception {
-		rabbitTemplate.convertAndSend(queueName, message);
-	}
+    @MessageMapping("${config.websocket.topicIncoming}")
+    public void onWebsocketMessage(IncomingMessage message) throws Exception {
+        IntStream.range(0, message.getCount()).parallel()
+                .forEach((i) -> rabbitTemplate.convertAndSend(queueName, message.getUrl()));
 
-	@RabbitListener(bindings = @QueueBinding(
-			value = @Queue("${config.rabbit.queue}"),
-			exchange = @Exchange(value = "${config.rabbit.exchange}", type = ExchangeTypes.TOPIC)))
-	public void onRabbitMessage(String message) {
-		websocketTemplate.convertAndSend(topicOutcoming, "Processed by server:" + message + "");
-	}
+    }
+
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue("${config.rabbit.queue}"),
+            exchange = @Exchange(value = "${config.rabbit.exchange}", type = ExchangeTypes.TOPIC)))
+    public void onRabbitMessage(String message) {
+        websocketTemplate.convertAndSend(topicOutcoming, "Processed by server:" + message + "");
+    }
+
+    public static class IncomingMessage {
+        private String url;
+        private Integer count;
+
+        public IncomingMessage(String url, Integer count) {
+            this.url = url;
+            this.count = count;
+        }
+
+        public IncomingMessage() {
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public Integer getCount() {
+            return count;
+        }
+
+        public void setCount(Integer count) {
+            this.count = count;
+        }
+    }
 
 }

@@ -22,27 +22,27 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 @EnableRabbit
 public class Application {
 
-	public static void main(String[] args) throws Exception {
-		SpringApplication.run(Application.class, args);
-	}
+    public static void main(String[] args) throws Exception {
+        SpringApplication.run(Application.class, args);
+    }
 
-	@Configuration
-	@EnableWebSocketMessageBroker
-	public static class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
+    @Configuration
+    @EnableWebSocketMessageBroker
+    public static class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
-		@Autowired
-		private Environment env;
+        @Autowired
+        private Environment env;
 
-		@Override
-		public void configureMessageBroker(MessageBrokerRegistry config) {
-			config.enableSimpleBroker(env.getRequiredProperty("config.websocket.topicOutcoming"));
-		}
+        @Override
+        public void configureMessageBroker(MessageBrokerRegistry config) {
+            config.enableSimpleBroker(env.getRequiredProperty("config.websocket.topicOutcoming"));
+        }
 
-		@Override
-		public void registerStompEndpoints(StompEndpointRegistry registry) {
-			registry.addEndpoint(env.getRequiredProperty("config.websocket.endpoint")).withSockJS();
-		}
+        @Override
+        public void registerStompEndpoints(StompEndpointRegistry registry) {
+            registry.addEndpoint(env.getRequiredProperty("config.websocket.endpoint")).withSockJS();
+        }
 
-	}
+    }
 
 }

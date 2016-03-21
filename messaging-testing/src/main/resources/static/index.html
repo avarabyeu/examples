@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="webjars/bootstrap/3.3.6/css/bootstrap.css"/>
     <link rel="stylesheet" href="app.css"/>
 
-    <script src="/webjars/angular/1.5.0/angular.js"></script>
+    <script src="/webjars/angular/1.5.2/angular.js"></script>
 
     <script src="/webjars/sockjs-client/1.0.3/dist/sockjs-1.0.3.js"></script>
     <script src="/webjars/stomp-websocket/2.3.4/lib/stomp.js"></script>
@@ -28,9 +28,24 @@
             <h1 class="text-center app-title">AMPQ Demo</h1>
             <div class="row  app-block">
                 <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Search for..." ng-model="outcomingMessage">
-                <span class="input-group-btn">
-                    <button class="btn btn-default" type="button" ng-click="sendMessage(outcomingMessage)">Send!</button>
+                    <input type="text" class="form-control" placeholder="Search for..." ng-model="url">
+                    <span class="input-group-btn">
+                    <div class="dropdown">
+                        <button class="btn btn-default dropdown-toggle" type="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            Count
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" ng-model="count">
+                            <li><a href="#">1</a></li>
+                            <li><a href="#">100</a></li>
+                            <li><a href="#">1000</a></li>
+                        </ul>
+                    </div>
+                        </span>
+                    <span class="input-group-btn">
+                        <button class="btn btn-success" type="button" ng-click="sendMessage(url,count)">Send!
+                        </button>
                     </span>
                 </div>
             </div><!-- /.row -->

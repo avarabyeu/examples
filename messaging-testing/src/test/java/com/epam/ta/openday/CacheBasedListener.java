@@ -5,24 +5,15 @@ import com.google.common.collect.EvictingQueue;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Queues;
 import com.jayway.awaitility.Awaitility;
-import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 
 import java.time.Duration;
 import java.util.Queue;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
-public class CacheBasedValidator {
-
-    /* Query Name/UUID for obtaining messages from RabbitMQ. Each time we need to create new queue */
-    public static final String QUERY_UUID = UUID.randomUUID().toString();
-    public static final String RABBIT_TRACE_EXCHANGE = "amq.rabbitmq.trace";
-    public static final String ALL_PUBLISHED_MESSAGES_QUEUE = "publish.#";
+public class CacheBasedListener extends AbstractListener {
 
     /* Queue with messages */
     private final Queue<Message> cache;
@@ -33,30 +24,11 @@ public class CacheBasedValidator {
      * @param rabbitAdmin RabbitMQ admin to register queue in RabbitMQ
      * @param cacheSize   Count of element to be kept in memory for validation
      */
-    public CacheBasedValidator(RabbitAdmin rabbitAdmin, Integer cacheSize) {
+    public CacheBasedListener(RabbitAdmin rabbitAdmin, Integer cacheSize) {
+        super(rabbitAdmin);
         this.cache = Queues.synchronizedQueue(EvictingQueue.create(cacheSize));
-
-        /* create exclusive non-durable queue for obtaining messages */
-        org.springframework.amqp.core.Queue queue =
-                new org.springframework.amqp.core.Queue(QUERY_UUID, false, true, true);
-
-        /* declare query */
-        rabbitAdmin.declareQueue(queue);
-
-        /* binds query to RabbitMQ logging topic */
-        rabbitAdmin.declareBinding(
-                BindingBuilder.bind(queue).to(new TopicExchange(RABBIT_TRACE_EXCHANGE)).with(
-                        ALL_PUBLISHED_MESSAGES_QUEUE));
-
-        rabbitAdmin.initialize();
     }
 
-    /**
-     * Asynchronously obtains messages from RabbitMQ
-     *
-     * @param message Message
-     */
-    @RabbitListener(queues = { "#{ T(com.epam.ta.openday.CacheBasedValidator).QUERY_UUID}" })
     public final void onMessage(Message message) {
         cache.offer(message);
     }

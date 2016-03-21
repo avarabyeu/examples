@@ -1,11 +1,10 @@
 package com.epam.ta.openday;
 
 import org.springframework.amqp.core.ExchangeTypes;
+import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -16,16 +15,12 @@ import java.io.IOException;
 
 @Configuration
 @PropertySource("classpath:application.yml")
+@EnableRabbit
 public class StealRabbitConfig {
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyConfigIn() throws IOException {
         return new PropertySourcesPlaceholderConfigurer();
-    }
-
-    @Bean
-    public CachingConnectionFactory connectionFactory(@Value("${spring.rabbitmq.host}") String rabbitHost) {
-        return new CachingConnectionFactory(rabbitHost);
     }
 
     @Component

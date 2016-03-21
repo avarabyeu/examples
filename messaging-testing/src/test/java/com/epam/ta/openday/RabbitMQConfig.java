@@ -60,12 +60,14 @@ public class RabbitMQConfig {
         return new RabbitAdmin(connectionFactory());
     }
 
-    /**
-     * @return Messaging validator
-     */
     @Bean
-    public CacheBasedValidator messagingValidator() {
-        return new CacheBasedValidator(rabbitAdmin(), messageValidatorCacheSize);
+    public CacheBasedListener cacheBasedListener() {
+        return new CacheBasedListener(rabbitAdmin(), messageValidatorCacheSize);
+    }
+
+    @Bean
+    public FilterBasedListener filterBasedListener() {
+        return new FilterBasedListener(rabbitAdmin());
     }
 
     @Bean

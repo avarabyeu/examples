@@ -7,6 +7,7 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
@@ -61,10 +62,12 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    @Lazy
     public CacheBasedListener cacheBasedListener() {
         return new CacheBasedListener(rabbitAdmin(), messageValidatorCacheSize);
     }
 
+    @Lazy
     @Bean
     public FilterBasedListener filterBasedListener() {
         return new FilterBasedListener(rabbitAdmin());

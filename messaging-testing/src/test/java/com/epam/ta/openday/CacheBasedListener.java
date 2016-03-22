@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
@@ -45,14 +46,12 @@ public class CacheBasedListener extends AbstractListener {
         Preconditions.checkArgument(null != duration, "Duration shouldn't be null");
 
         Awaitility.given().atMost(duration.toMillis(), TimeUnit.MILLISECONDS)
-                .pollDelay(com.jayway.awaitility.Duration.ONE_SECOND).until(() -> {
-            List<Message> messages;
-            //blocks receiving of messages until new copy is created
-            synchronized (cache) {
-                messages = new ArrayList<>(cache);
+                .pollDelay(com.jayway.awaitility.Duration.FIVE_SECONDS).until(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                List<Message> messages = new ArrayList<>(cache);
+                return messages.stream().filter(predicate).findAny().isPresent();
             }
-            return messages.stream().filter(predicate).findAny().isPresent();
-
         });
     }
 

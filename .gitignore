@@ -28,9 +28,9 @@ test-output
 */**/.gitignore
 
 ## Directory-based project format
-.idea/
+**/.idea/
 *.iml
 
 ## Gradle build directory
-build/
+**/build/
 .gradle/

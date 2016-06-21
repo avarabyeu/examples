@@ -21,10 +21,6 @@ apply plugin: 'spring-boot'
 group = 'com.epam.ta.openday.ampq'
 
 
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
 repositories {
     mavenCentral()
 }

@@ -1,0 +1,5 @@
+dependencies {
+    compile 'com.google.inject:guice:4.0'
+    compile 'org.seleniumhq.selenium:selenium-java:2.53.0'
+    compile 'org.apache.commons:commons-pool2:2.4.2'
+}

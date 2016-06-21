@@ -1,0 +1,27 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+allprojects {
+    apply plugin: 'idea'
+}
+
+subprojects {
+
+    apply plugin: 'java'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    repositories {
+        mavenCentral()
+    }
+
+
+    dependencies {
+        compile 'org.testng:testng:6.9.10'
+    }
+
+}

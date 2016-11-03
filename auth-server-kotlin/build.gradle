@@ -1,0 +1,33 @@
+buildscript {
+    ext.kotlin_version = '1.0.4'
+
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.4.1.RELEASE")
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
+    }
+}
+
+
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: 'spring-boot'
+
+repositories {
+    mavenCentral()
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-starter-parent:Camden.SR1"
+
+    }
+}
+dependencies {
+    compile 'org.springframework.cloud:spring-cloud-starter-oauth2'
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+}

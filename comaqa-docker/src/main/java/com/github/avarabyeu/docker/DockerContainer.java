@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.Arrays.asList;
+
 /**
  * Abstraction for creating/removing docker containers through API
  *
@@ -52,17 +54,11 @@ public class DockerContainer extends AbstractIdleService {
 
     @Override
     protected void startUp() throws Exception {
-        docker.listContainersCmd().withShowAll(true).exec().stream()
-                .filter(container -> Arrays.asList(container.getNames()).contains("/" + name)).findAny()
-                .ifPresent(container -> killContainer(container.getId()));
-
-        if (null != portMapping) {
-            docker.listContainersCmd().exec().stream()
-                    .flatMap(container -> Arrays.stream(container.getPorts()))
-                    .filter(port -> portMapping.containsKey(port.getPublicPort())).findAny()
-                    .ifPresent(port -> {
-                        throw new IllegalStateException("Port is already taken");
-                    });
+        /* if container should have specific name we need to check whether such containers are exist and kill them */
+        if (null != name) {
+            docker.listContainersCmd().withShowAll(true).exec().stream()
+                    .filter(container -> asList(container.getNames()).contains("/" + name)).findAny()
+                    .ifPresent(container -> killContainer(container.getId()));
         }
 
         CreateContainerCmd createCommand = docker.createContainerCmd(image)
@@ -71,12 +67,21 @@ public class DockerContainer extends AbstractIdleService {
             createCommand.withName(name);
         }
 
+        /* setup explicit port mapping if needed. make sure port is not taken for explicit port mapping */
         if (null != portMapping) {
+            docker.listContainersCmd().exec().stream()
+                    .flatMap(container -> Arrays.stream(container.getPorts()))
+                    .filter(port -> portMapping.containsKey(port.getPublicPort())).findAny()
+                    .ifPresent(port -> {
+                        throw new IllegalStateException("Port is already taken");
+                    });
+
             createCommand.withPortBindings(portMapping.entrySet().stream()
                     .map(entry -> new PortBinding(new Ports.Binding(null, entry.getKey().toString()),
                             new ExposedPort(entry.getValue()))).collect(
                             Collectors.toList()));
         } else {
+            /* publish all EXPOSEd ports if there are no explicit mappings */
             createCommand.withPublishAllPorts(true);
         }
 
@@ -84,6 +89,7 @@ public class DockerContainer extends AbstractIdleService {
             createCommand.withEnv(
                     env.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue()).collect(Collectors.toList()));
         }
+
         LOGGER.info("Starting container with name {}", name);
         containerId = createCommand.exec().getId();
 
@@ -102,13 +108,20 @@ public class DockerContainer extends AbstractIdleService {
         LOGGER.info("Container has started!\nImage: {}\nPorts: {}", image, ports);
     }
 
+    /**
+     * @return Port mappings: EXPOSED (internal/container) PORT -> MAPPED (external/host) PORT
+     */
     public Map<Integer, Integer> getExposedPorts() {
-        Preconditions.checkState(this.isRunning(), "Container is not running");
+        checkRunning();
         return this.ports;
     }
 
+    /**
+     * @return IP address in internal network. If default bridge network is used, Docker does NOT expose container name/id to DNS.
+     * So the easiest way to link containers together is to use internal IPs
+     */
     public String getInternalIP() {
-        Preconditions.checkState(this.isRunning(), "Container is not running");
+        checkRunning();
         final NetworkSettings networkSettings = docker.inspectContainerCmd(containerId).exec().getNetworkSettings();
         return networkSettings.getNetworks().entrySet().iterator().next().getValue().getIpAddress();
     }
@@ -121,5 +134,9 @@ public class DockerContainer extends AbstractIdleService {
     private void killContainer(String id) {
         LOGGER.info("Killing container with name {}", name);
         docker.removeContainerCmd(id).withForce(true).exec();
+    }
+
+    private void checkRunning() {
+        Preconditions.checkState(this.isRunning(), "Container is not running");
     }
 }

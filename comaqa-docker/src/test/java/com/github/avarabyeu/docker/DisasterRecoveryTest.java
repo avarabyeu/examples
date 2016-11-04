@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 /**
- * Created by avarabyeu on 11/4/16.
+ * @author Andrei Varabyeu
  */
 @Test
 @Guice(modules = { AuthServerDockerModule.class })

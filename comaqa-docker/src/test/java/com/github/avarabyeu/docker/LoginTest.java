@@ -15,7 +15,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 
 /**
- * Created by avarabyeu on 11/4/16.
+ * @author Andrei Varabyeu
  */
 @Test
 @Guice(modules = { AuthServerDockerModule.class })

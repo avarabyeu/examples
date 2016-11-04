@@ -8,9 +8,13 @@ import java.util.concurrent.TimeUnit;
 import static org.awaitility.Awaitility.await;
 
 /**
- * Created by avarabyeu on 11/4/16.
+ * @author Andrei Varabyeu
  */
 public class AwaitUtils {
+
+    private AwaitUtils() {
+        //statics only
+    }
 
     public static final long DEFAULT_WAIT_TIMEOUT = 5L;
     public static final int DEFAULT_POOL_DELAY = 10;

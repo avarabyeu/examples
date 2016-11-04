@@ -12,8 +12,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
 /**
@@ -61,7 +61,8 @@ public class DisasterRecoveryTest {
 
         tokenRequest.get()
                 .post("http://localhost:" + appPort + "/oauth/token")
-                .then().log().all().statusCode(500).body("error", is("server_error"));
+                .then().log().all().statusCode(503)
+                .body("error_description", containsString("Horrible exception"));
 
         redisServer = new DockerContainer(dockerClient, "redis:alpine", "redis", null, null, null);
         redisServer.startAsync().awaitRunning();

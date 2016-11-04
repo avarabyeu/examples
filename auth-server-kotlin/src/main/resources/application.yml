@@ -9,3 +9,11 @@ logging:
 spring:
   jackson:
     default-property-inclusion: non_null
+endpoints:
+  health:
+    enabled: true
+    sensitive: false
+management:
+  security:
+    enabled: false
+

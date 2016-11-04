@@ -3,8 +3,11 @@ package com.github.avarabyeu.example
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
+import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
@@ -21,7 +24,9 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer
+import org.springframework.security.oauth2.provider.token.TokenStore
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore
+import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore
 import org.springframework.security.provisioning.InMemoryUserDetailsManager
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
@@ -35,8 +40,7 @@ fun main(args: Array<String>) {
 open class AuthServerApp {
 
     companion object {
-        val USERS = listOf<UserDetails>(User("user", "password",
-                listOf(SimpleGrantedAuthority("USER"))))
+        val USERS = listOf<UserDetails>(User("user", "password", listOf(SimpleGrantedAuthority("USER"))))
     }
 }
 
@@ -62,6 +66,9 @@ open class AuthorizationServerConfig : AuthorizationServerConfigurerAdapter() {
     @Autowired
     lateinit var authManager: AuthenticationManager
 
+    @Autowired
+    lateinit var tokenStore: TokenStore
+
     override fun configure(clients: ClientDetailsServiceConfigurer) {
         //@formatter:off
         clients.inMemory()
@@ -75,9 +82,32 @@ open class AuthorizationServerConfig : AuthorizationServerConfigurerAdapter() {
     }
 
     override fun configure(endpoints: AuthorizationServerEndpointsConfigurer) {
-        endpoints.authenticationManager(authManager).tokenStore(InMemoryTokenStore())
+        endpoints.authenticationManager(authManager).tokenStore(tokenStore)
     }
 
+    /* default token store. Use it if nothing else in app context */
+    @Bean
+    open fun tokenStore(): TokenStore {
+        return InMemoryTokenStore()
+    }
+
+}
+
+/**
+ * If redis specified explicitly, then use it as token store
+ */
+@Configuration
+@ConditionalOnProperty("spring.redis.host")
+open class RedisConfiguration {
+
+    @Autowired
+    lateinit var redisConnectionFactory: RedisConnectionFactory
+
+    @Bean
+    @Primary
+    open fun redisTokenStore(): TokenStore {
+        return RedisTokenStore(redisConnectionFactory);
+    }
 }
 
 @Configuration
@@ -85,7 +115,7 @@ open class AuthorizationServerConfig : AuthorizationServerConfigurerAdapter() {
 open class ResourceServerConfig : ResourceServerConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity?) {
-        http!!.authorizeRequests().anyRequest().authenticated()
+        http!!.authorizeRequests().antMatchers("/api").authenticated()
     }
 }
 

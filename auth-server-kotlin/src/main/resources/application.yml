@@ -16,4 +16,7 @@ endpoints:
 management:
   security:
     enabled: false
-
+  #Disabled by default
+  health:
+    redis:
+      enabled: false

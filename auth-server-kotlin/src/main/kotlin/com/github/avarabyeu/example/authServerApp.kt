@@ -36,7 +36,6 @@ import org.springframework.security.oauth2.provider.token.store.redis.RedisToken
 import org.springframework.security.provisioning.InMemoryUserDetailsManager
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
-import redis.clients.jedis.exceptions.JedisConnectionException
 
 
 fun main(args: Array<String>) {
@@ -44,19 +43,17 @@ fun main(args: Array<String>) {
 }
 
 @SpringBootApplication
-open class AuthServerApp {
-
-    companion object {
-        val USERS = listOf<UserDetails>(User("user", "password", listOf(SimpleGrantedAuthority("USER"))))
-    }
-}
+open class AuthServerApp {}
 
 @Configuration
 open class GlobalAuthConfig : GlobalAuthenticationConfigurerAdapter() {
 
+    val USERS = listOf<UserDetails>(User("user", "password", listOf(SimpleGrantedAuthority("USER"))))
+
+
     @Bean
     open fun userDetailsService(): UserDetailsService {
-        return InMemoryUserDetailsManager(AuthServerApp.USERS)
+        return InMemoryUserDetailsManager(USERS)
     }
 
     override fun init(auth: AuthenticationManagerBuilder) {
@@ -92,8 +89,11 @@ open class AuthorizationServerConfig : AuthorizationServerConfigurerAdapter() {
         val exceptionTranslator = object : DefaultWebResponseExceptionTranslator() {
             override fun translate(e: Exception?): ResponseEntity<OAuth2Exception> {
                 if (e is RedisConnectionFailureException) {
-                    return ResponseEntity(OAuth2Exception.create("server_error", "Horrible exception!!! You are not lucky man"),
-                            HttpStatus.SERVICE_UNAVAILABLE)
+                    return ResponseEntity(object : OAuth2Exception("Horrible exception!!! You are not lucky man") {
+                        override fun getOAuth2ErrorCode(): String {
+                            return "server_error"
+                        }
+                    }, HttpStatus.SERVICE_UNAVAILABLE)
                 } else {
                     return super.translate(e)
                 }

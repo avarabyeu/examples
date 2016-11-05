@@ -13,10 +13,14 @@ endpoints:
   health:
     enabled: true
     sensitive: false
+  refresh:
+    enabled: false
 management:
   security:
     enabled: false
   #Disabled by default
   health:
     redis:
+      enabled: false
+    refresh:
       enabled: false
